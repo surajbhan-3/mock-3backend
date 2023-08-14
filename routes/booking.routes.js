@@ -32,84 +32,52 @@ bookingRouter.post("/booking", async(req,res)=>{
 bookingRouter.get("/dashboard", async(req,res)=>{
 
 
-       try {
-        
-        const allFlights = await BookingModel.findById();
-
-        return res.status(200).send(allFlights)
-        
-        
-       } catch (error) {
-        return res.send({"msg":error.message})
-        
-       }
-})
-
-
-
-
-bookingRouter.get("/dashboard/:id", async(req,res)=>{
-       const id = req.params.id;
-      
-
     try {
-
-          const flightData = await FlightModel.findById({_id:id})
-          
-           return res.status(200).send(flightData)
-          
-     
-    } catch (error) {
-
-        return res.send({"msg":error.message})
-     
-    }
+        const bookingData = await BookingModel.find()
+          .populate('user', '-password')
+          .populate('flight');
+        res.send(bookingData);
+      } catch (error) {
+        res.status(500).send({ error: error.message });
+      }
 })
+
 
 
 
 bookingRouter.patch("/dashboard/:id", async(req,res)=>{
-    const id = req.params.id;
-    const payload = req.body;
-   console.log(payload)
+       const id = req.params.id;
+      
 
- try {
+       try {
 
-
-       const flightData = await FlightModel.findByIdAndUpdate({_id:id},payload)
-       
-       if(!flightData){
-         return res.status(404).send("Error")
-       }
-       return res.status(204).send(flightData)
-       
-  
- } catch (error) {
-
-     return res.send({"msg":error.message})
-  
- }
+        const bookingData = await BookingModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.send(bookingData);
+      } catch (error) {
+        res.status(500).send({ error: error.message });
+      }
 })
+
+
+
 
 
 
 bookingRouter.delete("/dashboard/:id", async(req,res)=>{
     const id = req.params.id;
    
+    try {
+         await BookingModel.findByIdAndDelete(id);
 
- try {
-    
 
-       const flightData = await FlightModel.findByIdAndDelete({_id:id})
-       
-        return res.status(202).send("Data has been deleted")
-       
-  
- } catch (error) {
+      res.status(204).send({ message:"booking deleted" });
+    } catch (error) {
 
-     return res.send({"msg":error.message})
-  
- }
+
+      res.status(500).send({ error: error.message });
+    }
+
+
 })
 
 module.exports ={ bookingRouter}
