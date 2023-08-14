@@ -8,6 +8,9 @@ const {auth} = require("./middleware/auth")
 const app = express()
 app.use(express.json())
 
+app.get("/api",(req,res)=>{
+    res.send("Welcome to homp page")
+})
 app.use("/api", userRouter)
 app.use("/api",flightRouter)
 app.use("/api",auth,bookingRouter)
